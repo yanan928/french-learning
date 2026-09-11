@@ -1,0 +1,6 @@
+export const legacyLessons = [
+  {title:'从一句你好开始',name:'打招呼与告别',fr:'Les salutations',description:'用四句最常用的表达，开启你的第一段法语对话。',tip:'Bonjour 适合白天见面时使用；晚上打招呼可以说 Bonsoir。',words:[['Bonjour','你好 / 日安','bɔ̃.ʒuʁ'],['Salut','嗨 / 再见（熟人之间）','sa.ly'],['Merci','谢谢','mɛʁ.si'],['Au revoir','再见','o ʁə.vwaʁ']]},
+  {title:'很高兴认识你',name:'介绍自己',fr:'Se présenter',description:'说出你的名字，介绍你来自哪里，再认识一位新朋友。',tip:'Je m’appelle 后面直接接名字。初次见面，男性说 Enchanté，女性写作 Enchantée，读音相同。',words:[['Je m’appelle…','我的名字是……','ʒə ma.pɛl'],['Enchanté / Enchantée','很高兴认识你','ɑ̃.ʃɑ̃.te'],['Je viens de Chine','我来自中国','ʒə vjɛ̃ də ʃin'],['Et vous ?','您呢？','e vu']]},
+  {title:'来一杯咖啡吧',name:'在咖啡馆',fr:'Au café',description:'从点单到结账，练习在法国咖啡馆会用到的表达。',tip:'点单时加上 s’il vous plaît，会更礼貌。Un café 在法国通常指一小杯浓缩咖啡。',words:[['Un café, s’il vous plaît','请给我一杯咖啡','œ̃ ka.fe sil vu plɛ'],['Un croissant','一个羊角面包','œ̃ kʁwa.sɑ̃'],['L’addition, s’il vous plaît','请结账','la.di.sjɔ̃ sil vu plɛ'],['C’est délicieux !','真好吃！','sɛ de.li.sjø']]},
+  {title:'去发现这座城市',name:'问路与出行',fr:'En ville',description:'找地铁、问方向，一起走进城市的日常生活。',tip:'向陌生人问路时，可以先说 Bonjour，再用 Excusez-moi 礼貌地引起对方注意。',words:[['Excusez-moi','打扰一下 / 对不起','ɛks.ky.ze mwa'],['Où est le métro ?','地铁在哪里？','u ɛ lə me.tʁo'],['À gauche','向左 / 在左边','a ɡoʃ'],['À droite','向右 / 在右边','a dʁwat']]}
+];

@@ -1,28 +1,63 @@
 # Petit à petit · 每天一点法语
 
-面向中文使用者的法语入门静态网站，适配手机和桌面。无框架、无构建依赖、无后端。
+为《你好！法语》第一册学习者设计的 A1 学习伴侣。React + TypeScript + Vite，纯静态部署到 GitHub Pages，手机与桌面均可使用。
 
-包含 4 个生活主题、16 个表达、音标、设备法语朗读、翻卡练习和选择题。全对后完成课程，进度存于当前浏览器 localStorage，不跨设备同步。朗读依赖系统安装的法语语音；不可用时页面会提示，其他练习可正常使用。
+## 学习体验
 
-## 本地预览
+- 记录教材版本、当前单元和课名／页码，独立于网站练习的完成状态。
+- 四个原创 A1 场景：打招呼、介绍自己、咖啡馆、问路。
+- 听懂情景 → 拆解表达（词汇、翻卡、语音、语法）→ 练习巩固 → 交际任务与“我能……”自评。
+- 草稿、自评、表达练习结果保存于当前浏览器。兼容旧版 `petit-progress`：仅迁移为表达练习通过，不当作教材课次完成或交际能力达标。
+- 设备语音合成朗读，缺少法语语音时显示提示；不是随书原声，无发音评分或自由文本自动批改。
 
-在项目根目录执行 `python3 -m http.server 4173 --directory dist`，访问 http://localhost:4173 。
+## 教材依据与范围
 
-## 发布到 GitHub Pages
+见 [教学设计与内容来源](docs/teaching-design.md)。已确认出版社公开的教学理念和版本总体结构；未取得用户目录前，不给原创练习虚构教材课号、页码或逐课对应关系。
 
-1. 将项目上传到目标 GitHub 仓库的 `main` 分支，保留 `.github/workflows/pages.yml`。
-2. 在仓库 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**。
-3. 在 **Actions** 中运行 **Deploy to GitHub Pages**，或向 `main` 推送一次修改。
-4. 工作流成功后，在 Pages 设置或部署任务中打开网站链接，通常为 `https://用户名.github.io/仓库名/`。
+## 本地运行
 
-部署只上传 `dist`；所有页面资源使用相对路径，兼容仓库子路径。若默认分支不是 main，请修改工作流的分支名。公共仓库可使用 GitHub Free 的 Pages；私有仓库可用性取决于 GitHub 套餐。
+需要 Node.js 24。
 
-官方说明：https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
+```sh
+npm ci
+npm run dev
+```
 
-## 修改内容
+开发地址：http://127.0.0.1:5173/french-learning/
 
-- `dist/app.js`：课程、表达、音标和交互。
-- `dist/styles.css`：视觉样式与响应式布局。
-- `dist/index.html`：页面结构与网站信息。
+```sh
+npm run build
+npm run preview
+```
 
-字体全部使用系统字体，无第三方 CDN 依赖。可选 WebMCP 入口 `start_french_lesson` 仅在支持该接口的浏览器中注册。
+构建预览：http://127.0.0.1:4174/french-learning/
+
+## 发布
+
+向 `main` 推送时，`.github/workflows/pages.yml` 安装锁定依赖、执行类型检查和生产构建，并部署 `dist`。GitHub Pages 的 Source 设置为 GitHub Actions。
+
+线上地址：https://yanan928.github.io/french-learning/
+
+`vite.config.ts` 的 base 为 `/french-learning/`，更换仓库名称时须同步修改。`dist` 是构建产物，不提交；没有后端、密钥或第三方字体 CDN。
+
+## 内容与代码
+
+- `src/content.ts`：原创对话、学习目标、语法、语音、练习、任务与来源。
+- `src/legacy.ts`：保留的四组表达与音标。
+- `src/main.tsx`：React 学习界面与交互组件。
+- `src/state.ts`：本地存储校验及旧进度迁移。
+- `src/styles.css`：现有视觉风格与响应式布局。
+
+原书材料如需本地处理，放在已忽略的 `materials/` 目录；逐页读取与课程结构化，原文件不作为网站公开资源。
+
+## 浏览器验证
+
+安装全局 Playwright CLI 后，启动预览，执行：
+
+```sh
+playwright-cli -s=companion open http://127.0.0.1:4174/french-learning/
+playwright-cli -s=companion run-code --filename=tests/companion.browser.cjs
+playwright-cli -s=companion close
+```
+
+脚本在隔离的测试浏览器内清除该站点存储，验证旧进度迁移、教材位置、听力题反馈、翻卡、测验、草稿、自评、键盘操作和 320 / 390 / 768 / 1440 像素布局。语音实际听感需在安装法语语音的设备上人工确认。可选 WebMCP `start_french_lesson` 仅在浏览器支持时注册；不依赖它完成学习。
