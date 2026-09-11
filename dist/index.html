@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#234c3b"><meta name="description" content="Petit à petit，每天一点法语。从日常表达开始，用单词卡、法语朗读和小测验轻松入门。">
+  <title>Petit à petit · 每天一点法语</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23234c3b'/%3E%3Ctext x='11' y='29' fill='%23fff' font-family='Georgia' font-size='30'%3Ep%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css"><script src="./app.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="./"><span class="brand-icon">p.</span><span>petit à petit<small>每天一点法语</small></span></a><span class="header-note">一门语言，一点新世界。</span><span class="level">A1 · 零基础</span></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">UN PETIT PAS CHAQUE JOUR</p><h1>Bonjour，<span>从今天开始。</span></h1><p class="intro-copy">不用一次学很多。选一个生活场景，开口说出第一句法语。</p></div><div class="date-stamp"><span>法语学习手记</span><strong>petit<br>à petit.</strong><small>一点一滴，慢慢来。</small></div></section>
+    <div class="workspace">
+      <aside class="curriculum"><div class="section-heading"><h2>你的学习路线</h2><span>01 — 04</span></div><div id="lessons"></div><div class="progress-note"><span>已完成课程 <b id="completed-count">0 / 4</b></span><progress id="course-progress" value="0" max="4" aria-label="已完成课程"></progress><small>学习进度保存在当前浏览器</small></div></aside>
+      <section class="learning" aria-labelledby="lesson-title"><div class="lesson-heading"><div><p class="eyebrow" id="lesson-label">LEÇON 01 · LES SALUTATIONS</p><h2 id="lesson-title">从一句你好开始</h2></div><span class="duration">约 5 分钟</span></div><p id="lesson-description" class="muted"></p>
+        <div class="tabs" role="tablist" aria-label="学习模式"><button role="tab" aria-selected="true" id="tab-learn" aria-controls="study-panel" data-mode="learn">01 学表达</button><button role="tab" aria-selected="false" id="tab-cards" aria-controls="study-panel" data-mode="cards" tabindex="-1">02 记一记</button><button role="tab" aria-selected="false" id="tab-quiz" aria-controls="study-panel" data-mode="quiz" tabindex="-1">03 小测验</button></div>
+        <div id="study-panel" role="tabpanel" aria-labelledby="tab-learn"></div>
+      </section>
+    </div>
+    <section class="bottom-note"><span class="quote-mark">“</span><div><p lang="fr">Petit à petit, l’oiseau fait son nid.</p><span>一点一滴，鸟儿筑成巢。学习语言也是如此。</span></div><span class="note-label">一句法语，送给今天的你</span></section>
+  </main><footer><span>petit à petit <span class="footer-dot">·</span> 每天一点，离法语更近一点。</span><span>Fait avec plaisir ♡</span></footer><p id="announcement" class="toast" role="status" hidden></p>
+</body></html>
