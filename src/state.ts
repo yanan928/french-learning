@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { practices } from './content';
 
-export type Edition = 'unknown' | 'original' | 'second';
+export type Edition = 'original' | 'second';
 export type LearningState = {
   edition: Edition;
   unit: string;
@@ -14,13 +14,13 @@ export type LearningState = {
 const key = 'petit-companion-v2';
 
 export function loadState(): LearningState {
-  const initial: LearningState = { edition: 'unknown', unit: '1', bookLesson: '', active: 0, quizPassed: [], drafts: {}, checks: {} };
+  const initial: LearningState = { edition: 'original', unit: '1', bookLesson: '', active: 0, quizPassed: [], drafts: {}, checks: {} };
   try {
     const old = JSON.parse(localStorage.getItem('petit-progress') || '[]');
     if (Array.isArray(old)) initial.quizPassed = [...new Set(old.filter(i => Number.isInteger(i) && practices[i]).map(i => practices[i].id))];
     const saved = JSON.parse(localStorage.getItem(key) || 'null');
     if (!saved || typeof saved !== 'object') return initial;
-    if (['unknown', 'original', 'second'].includes(saved.edition)) initial.edition = saved.edition;
+    if (['original', 'second'].includes(saved.edition)) initial.edition = saved.edition;
     if (/^[1-9]$/.test(saved.unit) || (initial.edition === 'second' && saved.unit === 'phonetics')) initial.unit = String(saved.unit);
     if (typeof saved.bookLesson === 'string') initial.bookLesson = saved.bookLesson.slice(0, 80);
     if (Number.isInteger(saved.active) && practices[saved.active]) initial.active = saved.active;

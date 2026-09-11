@@ -83,7 +83,7 @@ const extensions = [
 
 export const practices: Practice[] = legacyLessons.map((lesson, index) => ({ ...lesson, ...extensions[index] }));
 export const sources = [
-  { title: '外研社 · 第一册旧版', url: 'https://mlp.fltrp.com/wys/bookstore/detail?id=1135&mid=' },
+  { title: '外研社 · 第一册第一版', url: 'https://mlp.fltrp.com/wys/bookstore/detail?id=1135&mid=' },
   { title: '外研社 · 第一册第二版', url: 'https://mlp.fltrp.com/edu/wys/bookstore/detail?id=2051&mid=13' },
   { title: 'Hachette · 原版教学理念', url: 'https://www.hachettefle.com/livre/le-nouveau-taxi-1-livre-de-leleve-a1-9782011555489/' },
 ];
