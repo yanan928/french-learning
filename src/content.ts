@@ -83,7 +83,15 @@ const extensions = [
 
 export const practices: Practice[] = legacyLessons.map((lesson, index) => ({ ...lesson, ...extensions[index] }));
 export const sources = [
-  { title: '外研社 · 第一册第一版', url: 'https://mlp.fltrp.com/wys/bookstore/detail?id=1135&mid=' },
+  { title: '第一版 · 学生用书', url: 'https://mlp.fltrp.com/wys/bookstore/detail?id=1135&mid=' },
+  { title: '第一版 · 教师用书', url: 'https://mlp.fltrp.com/wys/bookstore/detail?id=1151&mid=' },
+  { title: '第一版 · 配套练习册', url: 'https://mlp.fltrp.com/wys/bookstore/detail?id=1152&mid=' },
   { title: '外研社 · 第一册第二版', url: 'https://mlp.fltrp.com/edu/wys/bookstore/detail?id=2051&mid=13' },
   { title: 'Hachette · 原版教学理念', url: 'https://www.hachettefle.com/livre/le-nouveau-taxi-1-livre-de-leleve-a1-9782011555489/' },
+];
+
+export const bookRoles = [
+  { title: '学生用书：学什么', description: '以课次和交际目标为主线，组织情景理解、核心词汇、语法、语音与文化内容。' },
+  { title: '教师用书：怎么学懂', description: '核对教学步骤、背景知识与参考答案，把教学建议转化为分步提示和讲解。' },
+  { title: '配套练习册：练到会用', description: '按同一课的目标安排词汇、语法、动词变位与读写训练，先作答，再对照解析。' },
 ];
