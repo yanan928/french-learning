@@ -4,23 +4,12 @@ import { flushSync } from 'react-dom';
 import { practices, sources, bookRoles, type Practice } from './content';
 import { useLearningState, type Edition, type LearningState } from './state';
 import './styles.css';
+import { Sound } from './components/Sound';
+import { LessonFive } from './LessonFive';
 
 const steps = ['听懂情景', '拆解表达', '练习巩固', '完成任务'];
 type Update = (change: (previous: LearningState) => LearningState) => void;
 
-function Sound({ text, label = '朗读', notify }: { text: string; label?: string; notify: (message: string) => void }) {
-  function speak() {
-    if (!('speechSynthesis' in window)) return notify('当前浏览器不支持朗读，可以先阅读文字。');
-    const voice = speechSynthesis.getVoices().find(v => v.lang.toLowerCase().startsWith('fr'));
-    if (!voice) return notify('设备暂无法语语音，请在系统语音设置中添加法语后重试。');
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text.split(' / ')[0].replaceAll('…', ''));
-    utterance.voice = voice; utterance.lang = 'fr-FR'; utterance.rate = 0.8;
-    utterance.onerror = e => { if (!['interrupted', 'canceled'].includes(e.error)) notify('朗读暂时不可用，请检查系统语音设置。'); };
-    speechSynthesis.speak(utterance);
-  }
-  return <button className="sound" onClick={speak} aria-label={label}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M11 4 5 9H2v6h3l6 5  V4Z"/><path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg></button>;
-}
 
 function Choice({ item }: { item: Practice['listening'] }) {
   const [answer, setAnswer] = useState<number | null>(null);
@@ -62,7 +51,7 @@ function Mission({ practice, state, update }: { practice: Practice; state: Learn
 }
 
 function BookProgress({ state, update }: { state: LearningState; update: Update }) {
-  return <section className="book-progress"><div><p className="eyebrow">MON LIVRE · 我的教材</p><h2>《你好！法语》第一册</h2><p>{state.edition === 'original' ? '第一版 · A1 · 9 个单元 / 36 课' : state.edition === 'second' ? '第二版 · A1 · 含语音单元 / 共 40 课' : 'A1 入门 · 选择版本，记录跟书进度'}</p></div><details className="book-settings"><summary>设置教材进度</summary><div className="book-fields"><label>教材版本<select value={state.edition} onChange={e => update(s => ({ ...s, edition: e.target.value as Edition, unit: s.unit === 'phonetics' && e.target.value !== 'second' ? '1' : s.unit }))}><option value="original">第一版</option><option value="second">第二版</option></select></label><label>正在学<select value={state.unit} onChange={e => update(s => ({ ...s, unit: e.target.value }))}>{state.edition === 'second' && <option value="phonetics">语音单元</option>}{Array.from({ length: 9 }, (_, i) => <option value={String(i + 1)} key={i}>第 {i + 1} 单元</option>)}</select></label><label className="lesson-input">课名 / 页码<input value={state.bookLesson} maxLength={80} placeholder="记下书中的位置" onChange={e => update(s => ({ ...s, bookLesson: e.target.value }))}/></label></div><p className="book-caption">这里记录纸书进度；下方为原创 A1 情景练习，尚未按你的教材目录逐课对应。</p></details></section>;
+  return <section className="book-progress"><div><p className="eyebrow">MON LIVRE · 我的教材</p><h2>《你好！法语》第一册</h2><p>{state.edition === 'original' ? '第一版 · A1 · 9 个单元 / 36 课' : state.edition === 'second' ? '第二版 · A1 · 含语音单元 / 共 40 课' : 'A1 入门 · 选择版本，记录跟书进度'}</p></div><details className="book-settings"><summary>设置教材进度</summary><div className="book-fields"><label>教材版本<select value={state.edition} onChange={e => update(s => ({ ...s, edition: e.target.value as Edition, unit: s.unit === 'phonetics' && e.target.value !== 'second' ? '1' : s.unit }))}><option value="original">第一版</option><option value="second">第二版</option></select></label><label>正在学<select value={state.unit} onChange={e => update(s => ({ ...s, unit: e.target.value }))}>{state.edition === 'second' && <option value="phonetics">语音单元</option>}{Array.from({ length: 9 }, (_, i) => <option value={String(i + 1)} key={i}>第 {i + 1} 单元</option>)}</select></label><label className="lesson-input">课名 / 页码<input value={state.bookLesson} maxLength={80} placeholder="记下书中的位置" onChange={e => update(s => ({ ...s, bookLesson: e.target.value }))}/></label></div><p className="book-caption">这里记录你的纸书进度。第五课已核对三书内容；其他四个情景为原创拓展练习。</p></details></section>;
 }
 
 function App() {
@@ -74,7 +63,7 @@ function App() {
   const practice = practices[state.active];
   useEffect(() => { if ('speechSynthesis' in window) speechSynthesis.getVoices(); return () => { if ('speechSynthesis' in window) speechSynthesis.cancel(); }; }, []);
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(''), 7000); return () => clearTimeout(timer); }, [notice]);
-  function choose(index: number) { if ('speechSynthesis' in window) speechSynthesis.cancel(); update(s => ({ ...s, active: index })); setStep(0); }
+  function choose(index: number) { if ('speechSynthesis' in window) speechSynthesis.cancel(); update(s => ({ ...s, active: index, view: 'practice' })); setStep(0); }
   const completed = practices.filter(p => p.mission.checks.every((_, i) => state.checks[p.id]?.[i])).length;
   useEffect(() => {
     type Context = { registerTool: (tool: unknown, options: { signal: AbortSignal }) => unknown };
@@ -84,7 +73,54 @@ function App() {
     try { Promise.resolve(context.registerTool({ name: 'start_french_lesson', description: 'Open an original A1 practice scenario; does not mark a textbook lesson complete.', inputSchema: { type: 'object', properties: { lesson: { type: 'integer', minimum: 1, maximum: 4 } }, required: ['lesson'], additionalProperties: false }, annotations: { readOnlyHint: false }, execute(input: { lesson: number }) { if (!Number.isInteger(input?.lesson) || input.lesson < 1 || input.lesson > 4) throw new Error('lesson must be 1–4'); flushSync(() => choose(input.lesson - 1)); return { practice: practices[input.lesson - 1].id, step: '听懂情景' }; } }, { signal: lifecycle.signal })).catch(() => {}); } catch { /* Optional browser API. */ }
     return () => lifecycle.abort();
   }, []);
-  return <><header className="topbar"><a className="brand" href="./"><span className="brand-icon">p.</span><span>petit à petit<small>每天一点法语</small></span></a><span className="header-note">跟着书学，把法语用起来。</span><span className="level">A1 · 学习伴侣</span></header><main><section className="intro"><div><p className="eyebrow">APPRENDRE POUR AGIR</p><h1>学一点，<span>就用一点。</span></h1><p className="intro-copy">从听懂一句对话，到独立完成一次表达。让书上的法语走进生活。</p></div><div className="date-stamp"><span>我的法语学习手记</span><strong>à vous<br/>de jouer.</strong><small>轮到你，开口试试。</small></div></section><BookProgress state={state} update={update}/>{storageError && <p className="storage-warning" role="alert">当前浏览器无法保存数据。请暂时保留此页面，并自行备份草稿。</p>}<div className="workspace"><aside className="curriculum"><div className="section-heading"><h2>情景实践</h2><span>4 个交际任务</span></div><div id="lessons">{practices.map((p, i) => <button className={`lesson-link ${state.active === i ? 'active' : ''}`} data-lesson={i} aria-current={state.active === i ? 'step' : undefined} key={p.id} onClick={() => choose(i)}><span className="lesson-number">0{i + 1}</span><span><strong>{p.name}</strong><small lang="fr">{p.fr}</small></span><span className="arrow">{p.mission.checks.every((_, j) => state.checks[p.id]?.[j]) ? '✓' : '↗'}</span></button>)}</div><div className="progress-note"><span>交际任务 · 自评完成 <b>{completed} / 4</b></span><progress value={completed} max="4" aria-label="自评完成任务"/><small>你的表达练习记录已保留</small></div><div className="study-method"><p className="eyebrow">一课，一次小实践</p><ol><li>先听情景，理解意思</li><li>留意表达、语音和语法</li><li>练习，再独立表达</li><li>对照“我能……”自评</li></ol></div></aside><section className="learning" aria-labelledby="lesson-title"><div className="lesson-heading"><div><p className="eyebrow">ATELIER 0{state.active + 1} · {practice.fr.toUpperCase()}</p><h2 id="lesson-title">{practice.title}</h2></div><span className="duration">原创拓展练习</span></div><div className="goal"><span>今天的目标</span><p>{practice.goal}</p></div><div className="tabs" role="tablist" aria-label="学习步骤">{steps.map((label, i) => <button ref={el => { tabRefs.current[i] = el; }} role="tab" id={`tab-${i}`} aria-controls="study-panel" aria-selected={step === i} tabIndex={step === i ? 0 : -1} key={label} onClick={() => setStep(i)} onKeyDown={e => { let next = i; if (e.key === 'ArrowRight') next = (i + 1) % steps.length; else if (e.key === 'ArrowLeft') next = (i + steps.length - 1) % steps.length; else if (e.key === 'Home') next = 0; else if (e.key === 'End') next = steps.length - 1; else return; e.preventDefault(); setStep(next); tabRefs.current[next]?.focus(); }}><span>0{i + 1}</span> {label}</button>)}</div><div id="study-panel" role="tabpanel" aria-labelledby={`tab-${step}`} key={`${practice.id}-${step}`}>{step === 0 && <Scene practice={practice} notify={setNotice}/>} {step === 1 && <Language practice={practice} notify={setNotice}/>} {step === 2 && <Quiz practice={practice} onPassed={() => update(s => ({ ...s, quizPassed: [...new Set([...s.quizPassed, practice.id])] }))}/>} {step === 3 && <Mission practice={practice} state={state} update={update}/>}</div><div className="panel-footer step-footer"><small>{state.quizPassed.includes(practice.id) ? '✓ 表达练习已通过' : '理解 → 练习 → 表达'}</small>{step < 3 ? <button className="primary" onClick={() => { setStep(step + 1); tabRefs.current[step + 1]?.focus(); }}>继续：{steps[step + 1]} →</button> : <button className="secondary" onClick={() => choose((state.active + 1) % practices.length)}>换一个情景 →</button>}</div></section></div><section className="bottom-note"><span className="quote-mark">“</span><div><p lang="fr">Petit à petit, l’oiseau fait son nid.</p><span>学会的不只是单词，还有用法语做一件事的能力。</span></div><span className="note-label">每一次表达，都是进步</span></section><section className="sources"><button className="text-button" aria-expanded={showSources} onClick={() => setShowSources(!showSources)}>教材依据与内容说明 {showSources ? '−' : '+'}</button>{showSources && <div><h3>三本书，围绕同一课学习</h3>{bookRoles.map(book => <p key={book.title}><strong>{book.title}</strong><br/>{book.description}</p>)}<p>已核对第一版学生用书、教师用书和配套练习册的出版社介绍。上述为网站的课程组织原则；三本书的具体课文、教学页与习题尚未逐课核对。参考《你好！法语》及原版 Le Nouveau Taxi! 的行动导向、语言训练与能力自评思路设计。当前四个情景、对话和练习为网站原创，不是教材原课文或官方配套题。教材目录、课号与页码需按你使用的版本核对。</p><p>第一版第一册为 9 单元、36 课；第二版包含语音单元，出版社标注共 40 课。教材原音和视频请使用随书资源；这里的朗读使用设备合成语音。</p><div>{sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>)}</div></div>}</section></main><footer><span>petit à petit · 《你好！法语》第一册学习伴侣</span><span>Fait avec plaisir ♡</span></footer>{notice && <p className="toast" role="status">{notice}</p>}</>;
+  return <>
+    <header className="topbar">
+      <a className="brand" href="./"><span className="brand-icon">p.</span><span>petit à petit<small>每天一点法语</small></span></a>
+      <span className="header-note">跟着书学，把法语用起来。</span><span className="level">A1 · 学习伴侣</span>
+    </header>
+    <main>
+      <section className="intro"><div><p className="eyebrow">APPRENDRE POUR AGIR</p><h1>学一点，<span>就用一点。</span></h1><p className="intro-copy">从认出一件物品，到用法语说清它在哪里。</p></div><div className="date-stamp"><span>我的法语学习手记</span><strong>à vous<br/>de jouer.</strong><small>轮到你，开口试试。</small></div></section>
+      <BookProgress state={state} update={update}/>
+      {storageError && <p className="storage-warning" role="alert">当前浏览器无法保存数据。请暂时保留此页面，并自行备份草稿。</p>}
+      <div className="workspace">
+        <aside className="curriculum">
+          <div className="section-heading"><h2>教材同步课</h2><span>第一版 · 第二单元</span></div>
+          <button data-textbook="lesson-5" className={`lesson-link textbook-link ${state.view === 'lesson-5' ? 'active' : ''}`} aria-current={state.view === 'lesson-5' ? 'step' : undefined} onClick={() => {
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+            update(s => ({ ...s, view: 'lesson-5' }));
+          }}><span className="lesson-number">05</span><span><strong>找出物品</strong><small lang="fr">Trouvez l’objet</small></span><span className="arrow">{state.lessonFive.canDo.filter(Boolean).length === 5 ? '✓' : '↗'}</span></button>
+          <p className="source-tag nav-source">学生 p38–41 · 教师 p28–30<br/>练习册 p10–11</p>
+          <details className="extra-practices" open={state.view === 'practice'}><summary>情景拓展 · 4 个原创任务</summary>
+          <div id="lessons">{practices.map((p, i) => <button className={`lesson-link ${state.view === 'practice' && state.active === i ? 'active' : ''}`} data-lesson={i} aria-current={state.view === 'practice' && state.active === i ? 'step' : undefined} key={p.id} onClick={() => choose(i)}><span className="lesson-number">0{i + 1}</span><span><strong>{p.name}</strong><small lang="fr">{p.fr}</small></span><span className="arrow">{p.mission.checks.every((_, j) => state.checks[p.id]?.[j]) ? '✓' : '↗'}</span></button>)}</div>
+          <div className="progress-note"><span>拓展任务 · 自评完成 <b>{completed} / 4</b></span><progress value={completed} max="4" aria-label="自评完成任务"/><small>教材课与拓展任务分别记录</small></div></details>
+          <div className="study-method"><p className="eyebrow">一课，一次小实践</p><ol><li>先认物品，再听情景</li><li>观察冠词、语法和语音</li><li>练习，再独立表达</li><li>对照“我能……”自评</li></ol></div>
+        </aside>
+        {state.view === 'lesson-5' ? <LessonFive state={state} update={update} notify={setNotice}/> :
+          <section className="learning" aria-labelledby="lesson-title">
+            <div className="lesson-heading"><div><p className="eyebrow">ATELIER 0{state.active + 1} · {practice.fr.toUpperCase()}</p><h2 id="lesson-title">{practice.title}</h2></div><span className="duration">原创拓展练习</span></div>
+            <div className="goal"><span>今天的目标</span><p>{practice.goal}</p></div>
+            <div className="tabs" role="tablist" aria-label="学习步骤">{steps.map((label, i) => <button ref={el => { tabRefs.current[i] = el; }} role="tab" id={`tab-${i}`} aria-controls="study-panel" aria-selected={step === i} tabIndex={step === i ? 0 : -1} key={label} onClick={() => setStep(i)} onKeyDown={e => { let next = i; if (e.key === 'ArrowRight') next = (i + 1) % steps.length; else if (e.key === 'ArrowLeft') next = (i + steps.length - 1) % steps.length; else if (e.key === 'Home') next = 0; else if (e.key === 'End') next = steps.length - 1; else return; e.preventDefault(); setStep(next); tabRefs.current[next]?.focus(); }}><span>0{i + 1}</span> {label}</button>)}</div>
+            <div id="study-panel" role="tabpanel" aria-labelledby={`tab-${step}`} key={`${practice.id}-${step}`}>
+              {step === 0 && <Scene practice={practice} notify={setNotice}/>}
+              {step === 1 && <Language practice={practice} notify={setNotice}/>}
+              {step === 2 && <Quiz practice={practice} onPassed={() => update(s => ({ ...s, quizPassed: [...new Set([...s.quizPassed, practice.id])] }))}/>}
+              {step === 3 && <Mission practice={practice} state={state} update={update}/>}
+            </div>
+            <div className="panel-footer step-footer"><small>{state.quizPassed.includes(practice.id) ? '✓ 表达练习已通过' : '理解 → 练习 → 表达'}</small>{step < 3 ? <button className="primary" onClick={() => { setStep(step + 1); tabRefs.current[step + 1]?.focus(); }}>继续：{steps[step + 1]} →</button> : <button className="secondary" onClick={() => choose((state.active + 1) % practices.length)}>换一个情景 →</button>}</div>
+          </section>
+        }
+      </div>
+      <section className="bottom-note"><span className="quote-mark">“</span><div><p lang="fr">Petit à petit, l’oiseau fait son nid.</p><span>学会的不只是单词，还有用法语做一件事的能力。</span></div><span className="note-label">每一次表达，都是进步</span></section>
+      <section className="sources"><button className="text-button" aria-expanded={showSources} onClick={() => setShowSources(!showSources)}>教材依据与内容说明 {showSources ? '−' : '+'}</button>{showSources && <div>
+        <h3>三本书，围绕同一课学习</h3>{bookRoles.map(book => <p key={book.title}><strong>{book.title}</strong><br/>{book.description}</p>)}
+        <p>第五课已核对你提供的第一版第一册三书原页：学生 p38–41、教师 p28–30、练习册 p10–11。网站按教师指导组织预习、听读、讲解与任务，逐项标注书页。练习册解析由网站编写，未核对额外的答案页。其余四个情景仍为原创拓展练习，不对应教材第1至第4课。</p>
+        <p>教材原音需搭配随书资源；本网站播放按钮使用设备合成语音。你的 PDF 与扫描页不作为公开网站资源。</p>
+        <div>{sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>)}</div>
+      </div>}</section>
+    </main>
+    <footer><span>petit à petit · 《你好！法语》第一册学习伴侣</span><span>Fait avec plaisir ♡</span></footer>
+    {notice && <p className="toast" role="status">{notice}</p>}
+  </>;
 }
 
 createRoot(document.getElementById('root')!).render(<App/>);

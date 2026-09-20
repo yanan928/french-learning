@@ -6,6 +6,8 @@ async page => {
     localStorage.setItem('petit-progress', '[0,1,99]');
   });
   await page.reload();
+  await page.getByText('情景拓展 · 4 个原创任务', { exact: true }).click();
+  await page.locator('[data-lesson="0"]').click();
   await page.getByRole('heading', { name: '从一句你好开始' }).waitFor();
   if (!await page.getByText('✓ 表达练习已通过', { exact: true }).isVisible()) throw new Error('Legacy progress migration failed');
   await page.getByText('设置教材进度', {exact: true}).click();
