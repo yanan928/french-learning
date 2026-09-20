@@ -49,7 +49,7 @@ function PositionExplorer({ notify }: Pick<Props, 'notify'>) {
     <div className="position-buttons">{positions.map((item, i) => <button className={selected === i ? 'selected' : ''} aria-pressed={selected === i} key={item.fr} lang="fr" onClick={() => setSelected(i)}>{item.fr}</button>)}</div>
     <div className="position-demo">
       <svg viewBox="0 0 200 155" role="img" aria-label={`绿色圆点${position.zh}方框`}>
-        <rect x="70" y="52" width="60" height="52" rx="4" fill="#e7edff" stroke="#8095ca" strokeWidth="2"/>
+        <rect x="70" y="52" width="60" height="52" rx="4" fill="#e5ecf2" stroke="#93a6bb" strokeWidth="2"/>
         <circle cx={position.x} cy={position.y} r="8" fill="var(--red)"/>
         <text x="100" y="145" textAnchor="middle" fill="#536583" fontSize="10">圆点 = 要定位的物品</text>
       </svg>
