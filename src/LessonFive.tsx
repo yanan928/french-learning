@@ -49,9 +49,9 @@ function PositionExplorer({ notify }: Pick<Props, 'notify'>) {
     <div className="position-buttons">{positions.map((item, i) => <button className={selected === i ? 'selected' : ''} aria-pressed={selected === i} key={item.fr} lang="fr" onClick={() => setSelected(i)}>{item.fr}</button>)}</div>
     <div className="position-demo">
       <svg viewBox="0 0 200 155" role="img" aria-label={`绿色圆点${position.zh}方框`}>
-        <rect x="70" y="52" width="60" height="52" rx="4" fill="#e3e9db" stroke="#8b9b7b" strokeWidth="2"/>
-        <circle cx={position.x} cy={position.y} r="8" fill="#234c3b"/>
-        <text x="100" y="145" textAnchor="middle" fill="#687361" fontSize="10">圆点 = 要定位的物品</text>
+        <rect x="70" y="52" width="60" height="52" rx="4" fill="#e7edff" stroke="#8095ca" strokeWidth="2"/>
+        <circle cx={position.x} cy={position.y} r="8" fill="var(--red)"/>
+        <text x="100" y="145" textAnchor="middle" fill="#536583" fontSize="10">圆点 = 要定位的物品</text>
       </svg>
       <div aria-live="polite"><strong lang="fr">{position.fr}</strong><p>{position.zh}</p><p lang="fr">{position.sentence}</p><small>{position.translation}</small></div>
       <Sound text={position.sentence} label="朗读位置例句" notify={notify}/>
